@@ -24,24 +24,13 @@
 
 require_once (PATH_t3lib.'class.t3lib_div.php');
 /** 
- * Plugin 'Notify Changer'
+ * Plugin 'Cache Expire'
  *
  * @author	Martin Holtz <typo3@martinholtz.de>
  */
 class ux_tslib_tslib_fe extends tslib_fe {
 
 
-	function __construct() {
-		// new way - via Extension-Install
-		if (isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['mhnotifychanger'])) {
-			$feld = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['mhnotifychanger']);
-			if (t3lib_div::validEmail(trim($feld['email']))) $this->notifyHeader = 'From: '.trim($feld['name']).' <'.trim($feld['email'].'>');
-		}
-		// Old Way - if there is this configuration activ it should be used
-		if (isset($GLOBALS['TYPO3_CONF_VARS']['BE']['notifyHeader']) && '' != $GLOBALS['TYPO3_CONF_VARS']['BE']['notifyHeader']) {
-			$this->notifyHeader = trim($GLOBALS['TYPO3_CONF_VARS']['BE']['notifyHeader']);
-		}
-	}
 
 	/**
 	 * Sets cache content; Inserts the content string into the cache_pages table.
