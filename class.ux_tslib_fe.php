@@ -22,18 +22,27 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-require_once (PATH_t3lib.'class.t3lib_div.php');
+// require_once (PATH_t3lib.'class.t3lib_div.php');
 /** 
  * Plugin 'Cache Expire'
  *
  * @author	Martin Holtz <typo3@martinholtz.de>
  */
-class ux_tslib_tslib_fe extends tslib_fe {
+class ux_tslib_fe extends tslib_fe {
 
-
+	/*
+	function __construct() {
+		echo "__construct()";
+	}
+	
+	function ux_tslib_fe() {
+		$this->__construct();
+	}
+	*/
 
 	/**
 	 * Sets cache content; Inserts the content string into the cache_pages table.
+	 * It is a copy of the original Function (Revision: #4014, from 24.08.2008)
 	 *
 	 * @param	string		The content to store in the HTML field of the cache table
 	 * @param	mixed		The additional cache_data array, fx. $this->config
@@ -42,29 +51,43 @@ class ux_tslib_tslib_fe extends tslib_fe {
 	 * @see realPageCacheContent(), tempPageCacheContent()
 	 */
 	function setPageCacheContent($content,$data,$tstamp)	{
+					
+		$this->clearPageCacheContent();
+		
+		/* Start new CODE */
+		
 		// Config
 		// TODO: use it
 		$config = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cacheexpire']);
 	
-	
-		// TODO: write an hook, so somebody else can add additional stuff
-	
-		$this->clearPageCacheContent();
-// MH : XCLASS tslib_fe::setPageCacheContent...?	
+		// TODO: write an hook, so somebody else can add additional stuff?
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'tt_content', 'tt_content.pid='.intval($this->id).' AND tt_content.hidden=0 AND tt_content.deleted=0 AND (starttime > 0 OR endtime > 0) ');
 		if ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))	{
-			// starttime 	endtime
-			// not shown yet, but starttime is before expire-date
-			// starttime must be in future to have an influence
+			// $tstamp is the orignial expire-date of that page
+			// usually it is calculated by cache-expiredate and 
+			// $GLOBALS['EXEC_TIME']
+			// the page starttime/endtime is checked before
+			// it is requested from cache. So we do not have to care
+			// of starttime/endtime of the page itself 
+			
+			// we want to respect the starttime / endtime of the
+			// content elements 
+			// 
+			// we have to check for each content element only, if it has a starttime
+			// or an endtime which takes effect betwwen $GLOBALS['EXEC_TIME']
+			// and the default-expire date. 
 			if ($row['starttime'] > $GLOBALS['EXEC_TIME'] 
 				&& $row['starttime'] < $tstamp) {
+				if (TYPO3_DLOG)	{ t3lib_div::devLog('Expires was: '.$tstamp.' new Timestamp via starttime is: '.$row['starttime'].' (ID='.$row['id'].')','cacheexpire',0,$row); } 
 				$tstamp = $row['starttime'];
 			}
 			if ($row['endtime'] > $GLOBALS['EXEC_TIME']
 				&& $row['endtime'] < $tstamp) {
-				$tstamp = $row['endtime'];
-			}
+					if (TYPO3_DLOG)	{ t3lib_div::devLog('Expires was: '.$tstamp.' new Timestamp via endtime is: '.$row['endtime'].' (ID='.$row['id'].')','cacheexpire',0,$row); }
+					$tstamp = $row['endtime'];
+				}
 		}
+		/* END new Code */
 		
 		$insertFields = array(
 			'hash' => $this->newHash,
@@ -89,8 +112,8 @@ class ux_tslib_tslib_fe extends tslib_fe {
 
 }
 
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/cacheexpire/class.ux_tslib_tslib_fe.php']) {
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/cacheexpire/class.ux_tslib_tslib_fe.php']);
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/cacheexpire/class.ux_tslib_fe.php']) {
+	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/cacheexpire/class.ux_tslib_fe.php']);
 }
 
 ?>
