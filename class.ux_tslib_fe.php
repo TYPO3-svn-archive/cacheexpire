@@ -51,19 +51,22 @@ class ux_tslib_fe extends tslib_fe {
 		$config = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cacheexpire']);
 	
 		// TODO: write an hook, so somebody else can add additional stuff?
+
+		// t3lib_div::devLog('User is usergroup '.$this->fe_user->user['usergroup'].' ','cacheexpire',0,$this->fe_user->user);
+		
+		// AND tt_content.fe_group =
+		// t3lib_pageSelect::enableFields('tt_content',0,array(),FALSE)
 		
 		// Workspace does not matter, because they are on an different page
 		// so whe can use $this-id to check for content elements on this page
 		// Versioning does not matter, because they got pid = -1
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'tt_content', '
 		tt_content.pid='.intval($this->id).' 
-		AND tt_content.hidden=0 
-		AND tt_content.deleted=0 
 		AND (
 			(tt_content.starttime > '.$GLOBALS['EXEC_TIME'].' AND tt_content.starttime < '.$tstamp.')
 			OR 
 			(tt_content.endtime > '.$GLOBALS['EXEC_TIME'].' AND tt_content.endtime < '.$tstamp.')
-		)');
+		) '.t3lib_pageSelect::enableFields('tt_content',0,array('starttime' => true,'endtime' => true),FALSE));
 		if ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))	{
 			// $tstamp is the orignial expire-date of that page
 			// usually it is calculated by cache-expiredate and 

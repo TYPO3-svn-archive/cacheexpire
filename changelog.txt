@@ -1,0 +1,5 @@
+Abfrage mit Hilfe von enableFields erweitert
+
+ungetestet!
+
+versionierung und workspaces haben keinen Einfluss.
