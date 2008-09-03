@@ -1,5 +1,5 @@
-Abfrage mit Hilfe von enableFields erweitert
 
-ungetestet!
-
-versionierung und workspaces haben keinen Einfluss.
+09/03/08 Martin Holtz
+Added an hook,
+implemented an easy userfunction for tt_news expire timestamp calculating
+Group-Permissions are respected (via enalbeFields)

@@ -1,2 +1,1 @@
-# cat=basic; type=string; label=takes care of starttime/endtime of that tables too (not implemented yet)
-tables=tt_news
+
