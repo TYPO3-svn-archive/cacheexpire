@@ -44,18 +44,22 @@ class ux_tslib_fe extends tslib_fe {
 	function setPageCacheContent($content,$data,$tstamp)	{
 					
 		$this->clearPageCacheContent();
+
+		/* Start new CODE */
+		t3lib_div::devLog('without hook: '.$tstamp.' vs. '.$this->cacheExpires,'cacheexpire',0,$data);
+		if ($this->cacheExpires > 0 && $tstamp > $this->cacheExpires) { $tstamp = $this->cacheExpires; }
+		t3lib_div::devLog('without hook: '.$tstamp.' vs. '.$this->cacheExpires,'cacheexpire',0,$data);
 		
 		// Call hook for $tstamp calulating
 		if (is_array($this->TYPO3_CONF_VARS['SC_OPTIONS']['tslib/class.tslib_fe.php']['hook_cacheexpire_timestamp']))    {
 		    foreach($this->TYPO3_CONF_VARS['SC_OPTIONS']['tslib/class.tslib_fe.php']['hook_cacheexpire_timestamp'] as $_classRef)    {
-				t3lib_div::devLog('Before hook called: '.$tstamp.' ','cacheexpire',0,$data);
+				// t3lib_div::devLog('Before hook called: '.$tstamp.' ','cacheexpire',0,$data);
 		    	$_procObj = &t3lib_div::getUserObj($_classRef);
 		        $tstamp = $_procObj->calculateExpireTimestamp(array('tstamp' => $tstamp, 'pid' => $this->id),$this);
-		        t3lib_div::devLog('After hook called: '.$tstamp,'cacheexpire',0,$data);
+		        // t3lib_div::devLog('After hook called: '.$tstamp,'cacheexpire',0,$data);
 		    }
 		}
 		
-		/* Start new CODE */
 		
 		$sys_page = t3lib_div::makeInstance('t3lib_pageSelect');
 		
