@@ -1,3 +1,7 @@
+13.09.2008: Martin holtz
+	* removed reference to tt_news
+	* added hook like it is done in the patch-request for the core
+	* hook does not work at the moment
 
 09/03/08 Martin Holtz
 Added an hook,

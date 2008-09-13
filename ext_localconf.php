@@ -33,7 +33,7 @@ if (!defined ("TYPO3_MODE")) 	die ("Access denied.");
 
 $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['tslib/class.tslib_fe.php']=t3lib_extMgm::extPath('cacheexpire').'class.ux_tslib_fe.php';
 
-$TYPO3_CONF_VARS['SC_OPTIONS']['tslib/class.tslib_fe.php']['hook_cacheexpire_timestamp'][] = t3lib_extMgm::extPath('cacheexpire').'class.user_tt_news_cacheexpire.php:&user_tt_news_cacheexpire'; 
+// $TYPO3_CONF_VARS['SC_OPTIONS']['tslib/class.tslib_fe.php']['hook_cacheexpire_timestamp'][] = t3lib_extMgm::extPath('cacheexpire').'class.user_tt_news_cacheexpire.php:&user_tt_news_cacheexpire'; 
 
 
 ?>

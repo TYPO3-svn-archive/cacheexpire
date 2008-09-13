@@ -19,9 +19,9 @@ have no influence.
 
 At this time, it checks only tt_content elements on that page.
 
-It is not tested with versioning or workspaces at this time.
-
 Feedback is welcome - please use bugtracker on forge.typo3.org
+
+ok, i started an manuall - please read that, 13.09.2008
 
 thanks,
 martin
