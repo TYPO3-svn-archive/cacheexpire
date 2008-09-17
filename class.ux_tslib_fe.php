@@ -1,19 +1,19 @@
 <?php
 /***************************************************************
 *  Copyright notice
-*  
+*
 *  (c) 2008 Martin Holtz (typo3@martinholtz.de)
 *  All rights reserved
 *
-*  This script is part of the TYPO3 project. The TYPO3 project is 
+*  This script is part of the TYPO3 project. The TYPO3 project is
 *  free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
 *  the Free Software Foundation; either version 2 of the License, or
 *  (at your option) any later version.
-* 
+*
 *  The GNU General Public License can be found at
 *  http://www.gnu.org/copyleft/gpl.html.
-* 
+*
 *  This script is distributed in the hope that it will be useful,
 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,14 +23,14 @@
 ***************************************************************/
 
 // require_once (PATH_t3lib.'class.t3lib_div.php');
-/** 
+/**
  * Plugin 'Cache Expire'
  *
  * @author	Martin Holtz <typo3@martinholtz.de>
  */
 class ux_tslib_fe extends tslib_fe {
-	
-	
+
+
 	/**
 	 * Sets cache content; Inserts the content string into the cache_pages table.
 	 * It is a copy of the original Function (Revision: #4014, from 24.08.2008)
@@ -49,45 +49,46 @@ class ux_tslib_fe extends tslib_fe {
 		if (!$this->tempContent) {
 				// can be changed from an extension via $GLOBALS['TSFE']->cacheExpires
 			if ($this->cacheExpires > 0 && $tstamp > $this->cacheExpires) { $tstamp = $this->cacheExpires; }
-			
+
 				// Call hook for $tstamp calulating
+				// TODO: implement the interface
 			if(is_array($TYPO3_CONF_VARS['SC_OPTIONS']['tslib/class.tslib_fe.php']['setPageCacheContent'])) {
 				foreach($TYPO3_CONF_VARS['SC_OPTIONS']['tslib/class.tslib_fe.php']['setPageCacheContent'] as $classData) {
 					$hookObject = &t3lib_div::getUserObj($classData);
-	
+
 					if(!($hookObject instanceof tslib_fe_setPageCacheContentHook)) {
-							// TODO: Exception: is that an timestamp?
+							// TODO: should be an timestamp
 						throw new UnexpectedValueException('$hookObject must implement interface tslib_content_tslib_fe_setPageCacheContentHook', 1);
 					}
-					$tstamp = $hookObject->getCacheExpiresTimestamp($tstamp, $this->id, $data);				
+					$tstamp = $hookObject->getCacheExpiresTimestamp($tstamp, $this->id, $data);
 				}
 			}
-					
+
 			$pageSelect = t3lib_div::makeInstance('t3lib_pageSelect');
-			
+
 				// Workspace does not matter, because they are on an different page
 				// so whe can use $this-id to check for content elements on this page
 				// Versioning does not matter, because they got pid = -1
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-				'*', 
-				'tt_content', 
+				'*',
+				'tt_content',
 				'tt_content.pid='.intval($this->id).' AND (	(tt_content.starttime > '.$GLOBALS['EXEC_TIME'].' AND tt_content.starttime < '.$tstamp.') OR (tt_content.endtime > '.$GLOBALS['EXEC_TIME'].' AND tt_content.endtime < '.$tstamp.')) '.$pageSelect->enableFields('tt_content',0,array('starttime' => true,'endtime' => true),FALSE));
-			
+
 			while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))	{
 					// $tstamp is the orignial expire-date of that page
-					// usually it is calculated by cache-expiredate and 
+					// usually it is calculated by cache-expiredate and
 					// $GLOBALS['EXEC_TIME']
 					// the page starttime/endtime is checked before
 					// it is requested from cache. So we do not have to care
-					// of starttime/endtime of the page itself 
-					
+					// of starttime/endtime of the page itself
+
 					// we want to respect the starttime / endtime of the
-					// content elements 
-					// 
+					// content elements
+					//
 					// we have to check for each content element only, if it has a starttime
 					// or an endtime which takes effect betwwen $GLOBALS['EXEC_TIME']
-					// and the default-expire date ($tstamp). 
-				if ($row['starttime'] < $tstamp && $row['starttime'] > $GLOBALS['EXEC_TIME']) {  
+					// and the default-expire date ($tstamp).
+				if ($row['starttime'] < $tstamp && $row['starttime'] > $GLOBALS['EXEC_TIME']) {
 					$tstamp = $row['starttime'];
 				}
 				if ($row['endtime'] < $tstamp && $row['endtime'] > $GLOBALS['EXEC_TIME']) {
@@ -95,7 +96,7 @@ class ux_tslib_fe extends tslib_fe {
 				}
 			}
 		}
-			
+
 		$insertFields = array(
 			'hash' => $this->newHash,
 			'page_id' => $this->id,
@@ -115,7 +116,7 @@ class ux_tslib_fe extends tslib_fe {
 
 		$GLOBALS['TYPO3_DB']->exec_INSERTquery('cache_pages', $insertFields);
 	}
-	
+
 
 }
 
