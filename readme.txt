@@ -1,10 +1,12 @@
 README:
 
+well, the patch is pending in the core list...
+
 This is an simple xclass.
 
 The function setPageCacheContent is replaced by this extension.
 
-The extension gets the expire-timestamp which is configured by typoScript etc. 
+The extension gets the expire-timestamp which is configured by typoScript etc.
 
 If there is an tt_content element on that page (which is not hidden and not
 deleted) the starttime and the endtime will be checked too.
